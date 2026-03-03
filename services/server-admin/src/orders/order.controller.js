@@ -8,6 +8,75 @@ const VALID_TRANSITIONS = {
     "SERVIDO": []
 };
 
+export const getOrders = async (req, res) => {
+    try {
+        const { isActive } = req.query;
+
+        const filter = {};
+        if (isActive !== undefined) {
+            filter.isActive = isActive === 'true';
+        }
+
+        const orders = await Order.find(filter)
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            total: orders.length,
+            data: orders
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener las órdenes',
+            error: error.message
+        });
+    }
+};
+
+export const getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Orden no encontrada'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: order
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false, 
+            message: 'Error al obtener la orden',
+            error: error.message
+        });
+    }
+};
+
+export const getOrdersByTable = async (req, res) => {
+    try {
+        const { tableId } = req.params;
+        const orders = await Order.find({ table: tableId }).sort({ createdAt: -1 });
+        res.status(200).json({
+            success: true,
+            total: orders.length,
+            data: orders
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener las órdenes por mesa',
+            error: error.message
+        });
+    }
+};
+
 export const createOrder = async (req, res) => {
     try {
         const { table, restaurant, items } = req.body;
