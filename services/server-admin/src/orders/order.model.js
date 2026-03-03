@@ -5,29 +5,29 @@ const OrderSchema = new Schema(
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",
-      required: [true, "La mesa es obligatoria"]
+      required: [true, "La mesa es obligatoria"],
     },
     waiter: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "El mesero es obligatorio"]
+      required: [true, "El mesero es obligatorio"],
     },
     restaurant: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
-      required: [true, "El restaurante es obligatorio"]
+      required: [true, "El restaurante es obligatorio"],
     },
     items: [
       {
         menuItem: {
           type: Schema.Types.ObjectId,
           ref: "Menu",
-          required: [true, "El platillo es obligatorio"]
+          required: [true, "El platillo es obligatorio"],
         },
         quantity: {
           type: Number,
           required: [true, "La cantidad es obligatoria"],
-          min: [1, "La cantidad mínima es 1"]
+          min: [1, "La cantidad mínima es 1"],
         },
         modifiers: {
           type: [String],
@@ -36,41 +36,43 @@ const OrderSchema = new Schema(
         status: {
           type: String,
           enum: ["EN_ESPERA", "EN_COCINA", "LISTO", "SERVIDO"],
-          default: "EN_ESPERA"
+          default: "EN_ESPERA",
         },
         notes: {
           type: String,
-          default: ""
+          default: "",
         },
         price: {
           type: Number,
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     ],
     status: {
       type: String,
       enum: ["ABIERTA", "CERRADA", "CANCELADA"],
-      default: "ABIERTA"
+      default: "ABIERTA",
     },
     total: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
-OrderSchema.pre("save", function (next) {
+OrderSchema.pre("save", function () {
   if (this.items && this.items.length > 0) {
-    this.total = this.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    this.total = this.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0,
+    );
   } else {
     this.total = 0;
   }
-  next();
+  // Mongoose 9 detecta automáticamente cuando la función termina
 });
-
 export default model("Order", OrderSchema);

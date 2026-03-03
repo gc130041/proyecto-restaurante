@@ -11,7 +11,7 @@ const VALID_TRANSITIONS = {
 export const createOrder = async (req, res) => {
     try {
         const { table, restaurant, items } = req.body;
-        const waiter = req.usuario._id; 
+        const waiter = req.user._id; 
 
         const tableUpdate = await Table.findOneAndUpdate(
             { _id: table, status: "Disponible" }, 
